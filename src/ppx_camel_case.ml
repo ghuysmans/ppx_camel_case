@@ -26,6 +26,11 @@ let name_attr =
     Ast_pattern.(single_expr_payload (estring __))
     (fun x -> x)
 
+let name_attr' =
+  Attribute.(declare "name" Context.rtag)
+    Ast_pattern.(single_expr_payload (estring __))
+    (fun x -> x)
+
 let plugin_attr =
   Attribute.(declare "camel_case" Context.type_declaration)
     Ast_pattern.(pstr nil)
@@ -42,14 +47,26 @@ let mapper = object
       super#type_declaration
 
   method! label_declaration ({pld_name; pld_attributes = a; _} as d) =
+    super#label_declaration @@
     match Attribute.get key_attr ~mark_as_seen:false d with
     | None -> {d with pld_attributes = generate key_attr pld_name :: a}
     | Some _ -> d
 
   method! constructor_declaration ({pcd_name; pcd_attributes = a; _} as d) =
+    super#constructor_declaration @@
     match Attribute.get name_attr ~mark_as_seen:false d with
     | None -> {d with pcd_attributes = generate name_attr pcd_name :: a}
     | Some _ -> d
+
+  method! row_field ({prf_desc; prf_attributes = a; _} as f) =
+    super#row_field @@
+    match prf_desc with
+    | Rtag (name, _, _) ->
+      begin match Attribute.get name_attr' ~mark_as_seen:false f with
+      | None -> {f with prf_attributes = generate name_attr' name :: a}
+      | Some _ -> f
+      end
+    | _ -> f
 end
 
 let my_deriver =
