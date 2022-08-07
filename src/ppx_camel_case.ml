@@ -53,4 +53,4 @@ end
 let my_deriver =
   Driver.register_transformation
     "camel_case"
-    ~impl:(fun st -> mapper#structure st)
+    ~preprocess_impl:(fun st -> mapper#structure st)
