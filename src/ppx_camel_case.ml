@@ -4,7 +4,9 @@ open Ast_helper
 let camel_of_snake snake =
   match String.split_on_char '_' snake with
   | [] -> "" (* this should not happen *)
-  | h :: t -> h ^ String.concat "" (List.map String.capitalize_ascii t)
+  | h :: t ->
+    String.lowercase_ascii h ^
+    String.concat "" (List.map String.capitalize_ascii t)
 
 let generate attr {txt; loc} =
   with_default_loc loc (fun () ->
