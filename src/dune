@@ -1,5 +1,5 @@
 (library
- (name ppx_camel_case)
+ (public_name ppx_camel_case)
  (kind ppx_rewriter)
  (libraries ppxlib)
  (preprocess (pps ppxlib.metaquot)))
